@@ -1,13 +1,20 @@
 package controllers
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/deadking/go-bookstore/pkg/models"
+	"github.com/deadking/go-bookstore/pkg/utils"
 )
 
 var NewBook models.Book
 var BasicID string = "0"
+
+type CustomResponse struct {
+	content models.Book
+	msg string
+}
 
 func GetBookAnyway(w http.ResponseWriter, r *http.Request) {
 	// q := r.URL.Query().Get("bookId")
@@ -26,16 +33,17 @@ func GetBookAnyway(w http.ResponseWriter, r *http.Request) {
 	// w.Write(res)
 }
 
-func CreateBook(w http.ResponseWriter, r *http.Request) {
-	// finalmsg := make(map[string]interface{})
-	// createBook := &models.Book{}
-	// utils.ParseBody(r, createBook)
-	// b, msg := createBook.CreateBook()
-	// finalmsg["Response"] = msg
-	// finalmsg["Content"] = b
-	// res, _ := json.Marshal(finalmsg)
-	// w.WriteHeader(http.StatusCreated)
-	// w.Write(res)
+func CreateBook(w http.ResponseWriter, r *http.Request) { 
+	createBook := &models.Book{}
+	utils.ParseBody(r, createBook)
+	b, msg := createBook.CreateBook()
+	finalMsg := &CustomResponse{
+		content: b,
+		msg: msg,
+	}
+	res, _ := json.Marshal(finalMsg)
+	w.WriteHeader(http.StatusCreated)
+	w.Write(res)
 }
 
 func DeleteBook(w http.ResponseWriter, r *http.Request) {
