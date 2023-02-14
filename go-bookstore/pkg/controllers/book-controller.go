@@ -2,45 +2,50 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/deadking/go-bookstore/pkg/models"
-	"github.com/deadking/go-bookstore/pkg/utils"
 )
 
 var NewBook models.Book
 var BasicID string = "0"
 
 type CustomResponse struct {
-	content models.Book
-	msg string
+	Content models.TempBook
+	Msg     string
 }
 
 func GetBookAnyway(w http.ResponseWriter, r *http.Request) {
-	// q := r.URL.Query().Get("bookId")
-	// bookId := q
-	// if q == "" {
-	// 	bookId = BasicID
-	// }
-	// temp, err := strconv.ParseInt(bookId, 0, 0)
-	// if err != nil {
-	// 	fmt.Println("Enter a valid Book ID :", err)
-	// }
-	// bookDetails, _ := models.GetBookAnyway(temp)
-	// res, _ := json.Marshal(bookDetails)
-	// w.Header().Set("Content-Type", "pkglication/json")
-	// w.WriteHeader(http.StatusOK)
-	// w.Write(res)
+	q := r.URL.Query().Get("bookId")
+	bookId := q
+	if q == "" {
+		bookId = BasicID
+	}
+	temp, err := strconv.ParseInt(bookId, 0, 0)
+	if err != nil {
+		fmt.Println("Enter a valid Book ID :", err)
+	}
+	bookDetails, _ := models.GetBookAnyway(temp)
+	res, _ := json.Marshal(bookDetails)
+	w.Header().Set("Content-Type", "pkglication/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
 }
 
-func CreateBook(w http.ResponseWriter, r *http.Request) { 
-	createBook := &models.Book{}
-	utils.ParseBody(r, createBook)
-	b, msg := createBook.CreateBook()
+func CreateBook(w http.ResponseWriter, r *http.Request) {
+	book := models.TempBook{}
+	// utils.ParseBody(r, createBook)
+
+	json.NewDecoder(r.Body).Decode(&book)
+	// fmt.Println(book)
+	b, msg := book.CreateBook()
 	finalMsg := &CustomResponse{
-		content: b,
-		msg: msg,
+		Content: *b,
+		Msg:     msg,
 	}
+	fmt.Println(finalMsg)
 	res, _ := json.Marshal(finalMsg)
 	w.WriteHeader(http.StatusCreated)
 	w.Write(res)

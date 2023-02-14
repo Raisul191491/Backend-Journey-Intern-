@@ -1,7 +1,7 @@
 package models
 
-type Author struct {
-	ID         uint `gorm:"primaryKey"`
-	AuthorName string
-	Age        int
-}
+// type Author struct {
+// 	AuthorID   uint `gorm:"primaryKey;autoIncrement:true"`
+// 	AuthorName string
+// 	Age        int
+// }

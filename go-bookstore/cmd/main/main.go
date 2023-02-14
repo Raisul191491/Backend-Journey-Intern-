@@ -3,10 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
-
 	"github.com/deadking/go-bookstore/pkg/routes"
 	"github.com/gorilla/mux"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 func main() {
