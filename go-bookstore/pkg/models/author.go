@@ -1,6 +1,10 @@
 package models
 
-import validation "github.com/go-ozzo/ozzo-validation"
+import (
+	"errors"
+
+	validation "github.com/go-ozzo/ozzo-validation"
+)
 
 type Author struct {
 	ID         uint   `gorm:"primaryKey;autoIncrement:true"`
@@ -8,17 +12,19 @@ type Author struct {
 	Age        int    `json:"age"`
 }
 
-type AgeError struct{}
-
-func (m *AgeError) Error() string {
-	return "Age must be within 12 to 130"
+func ageValidate(a int) validation.RuleFunc {
+	return func(value interface{}) error {
+		age, _ := value.(int)
+		if age < 12 || age > 130 {
+			return errors.New("age must be within 12 and 130")
+		}
+		return nil
+	}
 }
 
 func (a Author) Validate() error {
-	if a.Age < 12 || a.Age > 130 {
-		return &AgeError{}
-	}
 	return validation.ValidateStruct(&a,
 		validation.Field(&a.AuthorName, validation.Required, validation.Length(6, 150)),
+		validation.Field(&a.Age, validation.By(ageValidate(a.Age))),
 	)
 }
