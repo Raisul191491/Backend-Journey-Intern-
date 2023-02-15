@@ -11,7 +11,8 @@ import (
 )
 
 var (
-	BasicID string = "0"
+	DefaultBookID   string = "0"
+	DefaultAuthorID string = "0"
 )
 
 func GetBookAnyway(w http.ResponseWriter, r *http.Request) {
@@ -19,24 +20,46 @@ func GetBookAnyway(w http.ResponseWriter, r *http.Request) {
 	var books []models.Book
 
 	// Getting query data
-	q := r.URL.Query().Get("bookId")
-	bookId := q
-	if q == "" {
-		bookId = BasicID
+	tempBookID := r.URL.Query().Get("bookId")
+	tempAuthorID := r.URL.Query().Get("authorId")
+
+	bookId := tempBookID
+	if tempBookID == "" {
+		bookId = DefaultBookID
 	}
-	temp, err := strconv.ParseInt(bookId, 0, 0)
+	authorId := tempAuthorID
+	if tempAuthorID == "" {
+		authorId = DefaultAuthorID
+	}
+
+	tempBook, err := strconv.ParseInt(bookId, 0, 0)
 	if err != nil {
 		fmt.Println("Enter a valid Book ID :", err)
 	}
 
-	// Retrieve data
-	if temp > 0 {
-		db.Where("ID=?", temp).Find(&books)
+	tempAuthor, err := strconv.ParseInt(authorId, 0, 0)
+	if err != nil {
+		fmt.Println("Enter a valid Book ID :", err)
+	}
+
+	// Retrieve data by book id
+	if tempBook > 0 {
+		db.Where("ID=?", tempBook).Find(&books)
 	} else {
 		db.Find(&books)
 	}
 
-	res, _ := json.Marshal(books)
+	// Retrieve data by author id
+	if tempAuthor > 0 {
+		db.Where("author_id=?", tempAuthor).Find(&books)
+	} else {
+		db.Find(&books)
+	}
+
+	res, err := json.Marshal(books)
+	if err != nil {
+		fmt.Println("Marshalling error", err.Error())
+	}
 	w.Header().Set("Content-Type", "pkglication/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(res)

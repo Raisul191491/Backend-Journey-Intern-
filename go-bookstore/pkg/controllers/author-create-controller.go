@@ -10,22 +10,21 @@ import (
 	"github.com/deadking/go-bookstore/pkg/types"
 )
 
-func CreateBook(w http.ResponseWriter, r *http.Request) {
-
-	book := models.Book{}
-	finalMsg := types.CustomBookResponse{}
+func CreateAuthor(w http.ResponseWriter, r *http.Request) {
 	db = config.GetDB()
+	author := models.Author{}
+	finalMsg := types.CustomAuthorResponse{}
 
-	//  Create row
-	json.NewDecoder(r.Body).Decode(&book)
-	err := book.Validate()
+	// Create row
+	json.NewDecoder(r.Body).Decode(&author)
+	err := author.Validate()
 	if err == nil {
-		db.Table("books").Create(&book)
-		finalMsg.Msg = "Book created, Successfully"
+		db.Table("authors").Create(&author)
+		finalMsg.Msg = "Author created, Successfully"
 	} else {
 		finalMsg.Msg = err.Error()
 	}
-	finalMsg.Content = book
+	finalMsg.Content = author
 
 	res, err := json.Marshal(finalMsg)
 	if err != nil {

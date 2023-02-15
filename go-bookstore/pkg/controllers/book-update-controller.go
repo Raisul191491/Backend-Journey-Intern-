@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -46,7 +47,10 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	finalMsg.Content = book
-	res, _ = json.Marshal(finalMsg)
+	res, err = json.Marshal(finalMsg)
+	if err != nil {
+		fmt.Println("Marshalling error", err.Error())
+	}
 	w.Header().Set("Content-Type", "pkglication/json")
 	w.WriteHeader(http.StatusAccepted)
 	w.Write(res)

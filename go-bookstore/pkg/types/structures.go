@@ -6,3 +6,7 @@ type CustomBookResponse struct {
 	Content models.Book
 	Msg     string
 }
+type CustomAuthorResponse struct {
+	Content models.Author
+	Msg     string
+}
