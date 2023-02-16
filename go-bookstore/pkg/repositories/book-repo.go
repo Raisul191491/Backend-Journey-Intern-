@@ -18,24 +18,24 @@ func BookDbInstance(d *gorm.DB) IBookCRUD {
 	}
 }
 
-func (repo *dbs) Create(b models.Book) (models.Book, string) {
+func (repo *dbs) Create(b models.Book) (*models.Book, string) {
 	err := b.Validate()
 	if err == nil {
 		db.Table("books").Create(&b)
-		return b, "Book created, Successfully"
+		return &b, "Book created, Successfully"
 	}
-	return b, err.Error()
+	return &b, err.Error()
 }
 
-func (repo *dbs) Delete(ID int) (models.Book, string) {
+func (repo *dbs) Delete(ID int) string {
 	var deletedBook models.Book
 
 	db.Where("ID=?", ID).Find(&deletedBook)
 	if deletedBook.Name == "" || deletedBook.Publication == "" {
-		return deletedBook, "Book not found to begin with"
+		return "Book not found to begin with"
 	}
 	db.Where("ID=?", ID).Delete(&deletedBook)
-	return deletedBook, "Successfully deleted...."
+	return "Successfully deleted...."
 }
 
 func (repo *dbs) Update(ID int, updateBook models.Book) (models.Book, string) {

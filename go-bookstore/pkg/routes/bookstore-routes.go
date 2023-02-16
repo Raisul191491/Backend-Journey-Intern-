@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"github.com/deadking/go-bookstore/pkg/config"
 	"github.com/deadking/go-bookstore/pkg/controllers"
 	"github.com/deadking/go-bookstore/pkg/models"
 	"github.com/deadking/go-bookstore/pkg/repositories"
@@ -12,7 +13,7 @@ var db *gorm.DB
 
 var RegisteredBookStoreRoutes = func(router *mux.Router, db *gorm.DB) {
 
-	// InitializeDatabse()
+	InitializeDatabse()
 	Ibookcrud := repositories.BookDbInstance(db)
 	Iauthorcrud := repositories.AuthorDbInstance(db)
 	controllers.BookInterfaceInstance(Ibookcrud)
@@ -23,7 +24,7 @@ var RegisteredBookStoreRoutes = func(router *mux.Router, db *gorm.DB) {
 	router.HandleFunc("/book", controllers.GetBookAnyway).Methods("GET")
 	router.HandleFunc("/book/{bookId}", controllers.UpdateBook).Methods("PUT")
 	router.HandleFunc("/book/{bookId}", controllers.DeleteBook).Methods("DELETE")
-	
+
 	// Author routes
 	router.HandleFunc("/author", controllers.CreateAuthor).Methods("POST")
 	router.HandleFunc("/author", controllers.GetAuthor).Methods("GET")
@@ -31,6 +32,7 @@ var RegisteredBookStoreRoutes = func(router *mux.Router, db *gorm.DB) {
 }
 
 func InitializeDatabse() {
+	db = config.GetDB()
 	db.AutoMigrate(&models.Author{})
 	db.AutoMigrate(&models.Book{})
 	// db.Migrator().DropTable(&models.Book{}, &models.Author{})
