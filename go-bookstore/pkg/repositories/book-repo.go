@@ -64,13 +64,13 @@ func (repo *dbs) Get(bookID, authorID int) []models.Book {
 	var books []models.Book
 
 	if bookID > 0 {
-		db.Where("ID=?", bookID).Find(&books)
+		db.Joins("Author").Where("`books`.`id`=?", bookID).Find(&books)
 	}
 	if authorID > 0 {
-		db.Where("author_id=?", authorID).Find(&books)
+		db.Joins("Author").Where("author_id=?", authorID).Find(&books)
 	}
 	if bookID == 0 && authorID == 0 {
-		db.Find(&books)
+		db.Joins("Author").Find(&books)
 	}
 	return books
 }
