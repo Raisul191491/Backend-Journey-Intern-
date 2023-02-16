@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/deadking/go-bookstore/pkg/config"
 	"github.com/deadking/go-bookstore/pkg/models"
+	"github.com/deadking/go-bookstore/pkg/repositories"
 )
 
 var (
@@ -16,7 +16,7 @@ var (
 )
 
 func GetBookAnyway(w http.ResponseWriter, r *http.Request) {
-	db = config.GetDB()
+
 	var books []models.Book
 
 	// Getting query data
@@ -42,19 +42,7 @@ func GetBookAnyway(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Enter a valid Book ID :", err)
 	}
 
-	// Retrieve data by book id
-	if tempBook > 0 {
-		db.Where("ID=?", tempBook).Find(&books)
-	} else {
-		db.Find(&books)
-	}
-
-	// Retrieve data by author id
-	if tempAuthor > 0 {
-		db.Where("author_id=?", tempAuthor).Find(&books)
-	} else {
-		db.Find(&books)
-	}
+	books = repositories.GetBook(int(tempBook), int(tempAuthor))
 
 	res, err := json.Marshal(books)
 	if err != nil {

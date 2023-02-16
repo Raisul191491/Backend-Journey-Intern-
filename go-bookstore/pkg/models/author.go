@@ -16,7 +16,7 @@ func ageValidate(a int) validation.RuleFunc {
 	return func(value interface{}) error {
 		age, _ := value.(int)
 		if age < 12 || age > 130 {
-			return errors.New("age must be within 12 and 130")
+			return errors.New(" must be within 12 and 130")
 		}
 		return nil
 	}

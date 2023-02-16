@@ -3,15 +3,17 @@ package routes
 import (
 	"github.com/deadking/go-bookstore/pkg/controllers"
 	"github.com/deadking/go-bookstore/pkg/models"
+	"github.com/deadking/go-bookstore/pkg/repositories"
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
 )
 
 var db *gorm.DB
 
-var RegisteredBookStoreRoutes = func(router *mux.Router) {
-	// Database Migration
-	//InitializeDatabse()
+var RegisteredBookStoreRoutes = func(router *mux.Router, db *gorm.DB) {
+
+	// InitializeDatabse()
+	repositories.DbInstance(db)
 
 	// Book routes
 	router.HandleFunc("/book", controllers.CreateBook).Methods("POST")

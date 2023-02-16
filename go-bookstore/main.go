@@ -16,10 +16,11 @@ func main() {
 
 	// Database connect
 	config.Connect()
+	DB = config.GetDB()
 
 	// Routing
 	r := mux.NewRouter()
-	routes.RegisteredBookStoreRoutes(r)
+	routes.RegisteredBookStoreRoutes(r, DB)
 	http.Handle("/", r)
 
 	// Initialize server

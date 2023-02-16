@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/deadking/go-bookstore/pkg/config"
 	"github.com/deadking/go-bookstore/pkg/models"
+	"github.com/deadking/go-bookstore/pkg/repositories"
 	"github.com/deadking/go-bookstore/pkg/types"
 	"github.com/gorilla/mux"
 )
@@ -15,7 +15,7 @@ import (
 func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	updateBook := models.Book{}
 	finalMsg := types.CustomBookResponse{}
-	db = config.GetDB()
+	// db = config.GetDB()
 
 	// Getting query data
 	json.NewDecoder(r.Body).Decode(&updateBook)
@@ -26,28 +26,8 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 		finalMsg.Msg = err.Error()
 	}
 
-	// Check and retrieve the book
-	var res []byte
-	var book models.Book
-	db.Where("ID=?", ID).Find(&book)
-
-	// Update or reject update
-	if updateBook.Name != "" {
-		book.Name = updateBook.Name
-	}
-	if updateBook.Publication != "" {
-		book.Publication = updateBook.Publication
-	}
-	err = book.Validate()
-	if err == nil {
-		db.Save(&book)
-		finalMsg.Msg = "Successfully updated"
-	} else {
-		finalMsg.Msg = err.Error()
-	}
-
-	finalMsg.Content = book
-	res, err = json.Marshal(finalMsg)
+	finalMsg.Content, finalMsg.Msg = repositories.UpdateBook(int(ID), updateBook)
+	res, err := json.Marshal(finalMsg)
 	if err != nil {
 		fmt.Println("Marshalling error", err.Error())
 	}
