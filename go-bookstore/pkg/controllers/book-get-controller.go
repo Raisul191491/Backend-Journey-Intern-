@@ -5,19 +5,14 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-
-	"github.com/deadking/go-bookstore/pkg/models"
-	"github.com/deadking/go-bookstore/pkg/repositories"
 )
 
 var (
-	DefaultBookID   string = "0"
-	DefaultAuthorID string = "0"
+	defaultBookID   string = "0"
+	defaultAuthorID string = "0"
 )
 
 func GetBookAnyway(w http.ResponseWriter, r *http.Request) {
-
-	var books []models.Book
 
 	// Getting query data
 	tempBookID := r.URL.Query().Get("bookId")
@@ -25,11 +20,11 @@ func GetBookAnyway(w http.ResponseWriter, r *http.Request) {
 
 	bookId := tempBookID
 	if tempBookID == "" {
-		bookId = DefaultBookID
+		bookId = defaultBookID
 	}
 	authorId := tempAuthorID
 	if tempAuthorID == "" {
-		authorId = DefaultAuthorID
+		authorId = defaultAuthorID
 	}
 
 	tempBook, err := strconv.ParseInt(bookId, 0, 0)
@@ -39,10 +34,10 @@ func GetBookAnyway(w http.ResponseWriter, r *http.Request) {
 
 	tempAuthor, err := strconv.ParseInt(authorId, 0, 0)
 	if err != nil {
-		fmt.Println("Enter a valid Book ID :", err)
+		fmt.Println("Enter a valid Author ID :", err)
 	}
 
-	books = repositories.GetBook(int(tempBook), int(tempAuthor))
+	books := BookInt.Get(int(tempBook), int(tempAuthor))
 
 	res, err := json.Marshal(books)
 	if err != nil {

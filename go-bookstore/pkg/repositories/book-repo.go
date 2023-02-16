@@ -1,15 +1,24 @@
 package repositories
 
-import "github.com/deadking/go-bookstore/pkg/models"
+import (
+	"github.com/deadking/go-bookstore/pkg/models"
+	"gorm.io/gorm"
+)
 
-// type TempBook struct {
-// 	ID          uint   `json:"id"`
-// 	Name        string `json:"name"`
-// 	Publication string `json:"publication"`
-// 	AuthorID    uint   `json:"author_id"`
-// }
+var db *gorm.DB
 
-func CreateBook(b models.Book) (models.Book, string) {
+type dbs struct {
+	DB *gorm.DB
+}
+
+func BookDbInstance(d *gorm.DB) IBookCRUD {
+	db = d
+	return &dbs{
+		DB: d,
+	}
+}
+
+func (repo *dbs) Create(b models.Book) (models.Book, string) {
 	err := b.Validate()
 	if err == nil {
 		db.Table("books").Create(&b)
@@ -18,7 +27,7 @@ func CreateBook(b models.Book) (models.Book, string) {
 	return b, err.Error()
 }
 
-func DeleteBook(ID int) (models.Book, string) {
+func (repo *dbs) Delete(ID int) (models.Book, string) {
 	var deletedBook models.Book
 
 	db.Where("ID=?", ID).Find(&deletedBook)
@@ -29,7 +38,7 @@ func DeleteBook(ID int) (models.Book, string) {
 	return deletedBook, "Successfully deleted...."
 }
 
-func UpdateBook(ID int, updateBook models.Book) (models.Book, string) {
+func (repo *dbs) Update(ID int, updateBook models.Book) (models.Book, string) {
 	var book models.Book
 	db.Where("ID=?", ID).Find(&book)
 	if book.Name == "" || book.Publication == "" {
@@ -51,7 +60,7 @@ func UpdateBook(ID int, updateBook models.Book) (models.Book, string) {
 	return book, err.Error()
 }
 
-func GetBook(bookID, authorID int) []models.Book {
+func (repo *dbs) Get(bookID, authorID int) []models.Book {
 	var books []models.Book
 
 	if bookID > 0 {

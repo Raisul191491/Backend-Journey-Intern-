@@ -10,3 +10,9 @@ type CustomAuthorResponse struct {
 	Content models.Author
 	Msg     string
 }
+
+type CustomAuthorDeleteResponse struct {
+	Content models.Author
+	Books   []models.Book
+	Msg     string
+}

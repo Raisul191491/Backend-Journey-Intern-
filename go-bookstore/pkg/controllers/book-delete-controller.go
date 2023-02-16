@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/deadking/go-bookstore/pkg/repositories"
 	"github.com/deadking/go-bookstore/pkg/types"
 	"github.com/gorilla/mux"
 )
@@ -22,7 +21,7 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err.Error())
 	}
 
-	finalMsg.Content, finalMsg.Msg = repositories.DeleteBook(int(ID))
+	finalMsg.Content, finalMsg.Msg = BookInt.Delete(int(ID))
 	res, err := json.Marshal(finalMsg)
 	if err != nil {
 		fmt.Println("Marshalling error", err.Error())

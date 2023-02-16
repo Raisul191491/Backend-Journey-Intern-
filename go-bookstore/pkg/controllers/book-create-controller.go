@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/deadking/go-bookstore/pkg/models"
-	"github.com/deadking/go-bookstore/pkg/repositories"
 	"github.com/deadking/go-bookstore/pkg/types"
 )
 
@@ -14,11 +13,9 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 
 	book := models.Book{}
 	finalMsg := types.CustomBookResponse{}
-	// db = config.GetDB()
 
-	//  Create row
 	json.NewDecoder(r.Body).Decode(&book)
-	finalMsg.Content, finalMsg.Msg = repositories.CreateBook(book)
+	finalMsg.Content, finalMsg.Msg = BookInt.Create(book)
 	res, err := json.Marshal(finalMsg)
 	if err != nil {
 		fmt.Println("Marshalling error", err.Error())

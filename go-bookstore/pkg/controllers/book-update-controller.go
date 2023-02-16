@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	"github.com/deadking/go-bookstore/pkg/models"
-	"github.com/deadking/go-bookstore/pkg/repositories"
 	"github.com/deadking/go-bookstore/pkg/types"
 	"github.com/gorilla/mux"
 )
@@ -26,7 +25,7 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 		finalMsg.Msg = err.Error()
 	}
 
-	finalMsg.Content, finalMsg.Msg = repositories.UpdateBook(int(ID), updateBook)
+	finalMsg.Content, finalMsg.Msg = BookInt.Update(int(ID), updateBook)
 	res, err := json.Marshal(finalMsg)
 	if err != nil {
 		fmt.Println("Marshalling error", err.Error())
