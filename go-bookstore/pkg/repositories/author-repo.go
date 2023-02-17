@@ -17,12 +17,8 @@ func AuthorDbInstance(d *gorm.DB) IAuthorCRUD {
 }
 
 func (repo *dba) Create(a models.Author) (*models.Author, string) {
-	err := a.Validate()
-	if err == nil {
-		db.Table("authors").Create(&a)
-		return &a, "Author created, Successfully"
-	}
-	return &a, err.Error()
+	db.Table("authors").Create(&a)
+	return &a, "Author created, Successfully"
 }
 
 // func (repo *dba) Update(ID int, updateAuthor models.Author) (models.Author, string)
@@ -40,12 +36,12 @@ func (repo *dba) Delete(ID int) string {
 	return "Successfully deleted...."
 }
 
-func (repo *dba) Get(authorID int) *[]models.Author {
+func (repo *dba) Get(authorID int) []models.Author {
 	var authors []models.Author
 	if authorID > 0 {
 		db.Where("id=?", authorID).Find(&authors)
-		return &authors
+		return authors
 	}
 	db.Find(&authors)
-	return &authors
+	return authors
 }

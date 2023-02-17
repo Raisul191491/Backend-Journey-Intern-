@@ -19,12 +19,16 @@ func BookDbInstance(d *gorm.DB) IBookCRUD {
 }
 
 func (repo *dbs) Create(b models.Book) (*models.Book, string) {
-	err := b.Validate()
-	if err == nil {
+	author := models.Author{}
+	if err := db.
+		Table("authors").
+		Where("id=?", b.AuthorID).
+		First(&author).
+		Error; err == nil {
 		db.Table("books").Create(&b)
 		return &b, "Book created, Successfully"
 	}
-	return &b, err.Error()
+	return nil, "Author does not exist"
 }
 
 func (repo *dbs) Delete(ID int) string {
@@ -42,7 +46,7 @@ func (repo *dbs) Update(ID int, updateBook models.Book) (models.Book, string) {
 	var book models.Book
 	db.Where("ID=?", ID).Find(&book)
 	if book.Name == "" || book.Publication == "" {
-		return book, "Book not found"
+		return models.Book{}, "Book not found"
 	}
 
 	// Update or reject update
@@ -63,13 +67,16 @@ func (repo *dbs) Update(ID int, updateBook models.Book) (models.Book, string) {
 func (repo *dbs) Get(bookID, authorID int) []models.Book {
 	var books []models.Book
 
-	if bookID > 0 {
+	if bookID > 0 && authorID > 0 {
+		db.
+			Joins("Author").
+			Where("`books`.`id`=? AND `author_id`=?", bookID, authorID).
+			Find(&books)
+	} else if bookID > 0 {
 		db.Joins("Author").Where("`books`.`id`=?", bookID).Find(&books)
-	}
-	if authorID > 0 {
+	} else if authorID > 0 {
 		db.Joins("Author").Where("author_id=?", authorID).Find(&books)
-	}
-	if bookID == 0 && authorID == 0 {
+	} else if bookID == 0 && authorID == 0 {
 		db.Joins("Author").Find(&books)
 	}
 	return books

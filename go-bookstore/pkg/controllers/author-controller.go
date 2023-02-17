@@ -17,8 +17,12 @@ func CreateAuthor(w http.ResponseWriter, r *http.Request) {
 
 	// Create row
 	json.NewDecoder(r.Body).Decode(&author)
-	finalMsg.Content, finalMsg.Msg = AuthorInt.Create(author)
-
+	err := author.Validate()
+	if err == nil {
+		finalMsg.Content, finalMsg.Msg = AuthorInt.Create(author)
+	} else {
+		finalMsg.Content, finalMsg.Msg = &models.Author{}, err.Error()
+	}
 	res, err := json.Marshal(finalMsg)
 	if err != nil {
 		fmt.Println("Marshalling error", err.Error())
@@ -50,27 +54,28 @@ func DeleteAuthor(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAuthor(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("Content-Type", "pkglication/json")
 	// Getting query data
-	tempAuthorID := r.URL.Query().Get("authorId")
+	authorId := r.URL.Query().Get("authorId")
 
-	authorId := tempAuthorID
-	if tempAuthorID == "" {
-		authorId = defaultAuthorID
-	}
-
-	tempAuthor, err := strconv.ParseInt(authorId, 0, 0)
-	if err != nil {
-		fmt.Println("Enter a valid author ID :", err)
-	}
-
+	tempAuthor, errAuthor := strconv.ParseInt(authorId, 0, 0)
 	authors := AuthorInt.Get(int(tempAuthor))
-
 	res, err := json.Marshal(authors)
+
+	if len(authors) == 0 {
+		res, err = json.Marshal("Msg : No authors found")
+	}
+	if err != nil {
+		fmt.Println("Marshalling error", err.Error())
+	} else if authorId != "" && errAuthor != nil {
+		res, err = json.Marshal("Msg : Invalid author Id")
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+
 	if err != nil {
 		fmt.Println("Marshalling error", err.Error())
 	}
-	w.Header().Set("Content-Type", "pkglication/json")
-	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }

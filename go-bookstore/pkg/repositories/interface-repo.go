@@ -13,5 +13,5 @@ type IAuthorCRUD interface {
 	Create(book models.Author) (*models.Author, string)
 	// Update(ID int, updateAuthor models.Author) (models.Author, string)
 	Delete(ID int) (string)
-	Get(authorID int) *[]models.Author
+	Get(authorID int) []models.Author
 }

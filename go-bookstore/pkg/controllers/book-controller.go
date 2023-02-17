@@ -11,18 +11,19 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var (
-	defaultBookID   string = "0"
-	defaultAuthorID string = "0"
-)
-
 func CreateBook(w http.ResponseWriter, r *http.Request) {
 
 	book := models.Book{}
 	finalMsg := types.CustomBookResponse{}
 
 	json.NewDecoder(r.Body).Decode(&book)
-	finalMsg.Content, finalMsg.Msg = BookInt.Create(book)
+	err := book.Validate()
+	if err == nil {
+		finalMsg.Content, finalMsg.Msg = BookInt.Create(book)
+	} else {
+		finalMsg.Content, finalMsg.Msg = &book, err.Error()
+	}
+
 	res, err := json.Marshal(finalMsg)
 	if err != nil {
 		fmt.Println("Marshalling error", err.Error())
@@ -54,40 +55,33 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetBookAnyway(w http.ResponseWriter, r *http.Request) {
-
+	w.Header().Set("Content-Type", "pkglication/json")
 	// Getting query data
-	tempBookID := r.URL.Query().Get("bookId")
-	tempAuthorID := r.URL.Query().Get("authorId")
+	bookId := r.URL.Query().Get("bookId")
+	authorId := r.URL.Query().Get("authorId")
 
-	bookId := tempBookID
-	if tempBookID == "" {
-		bookId = defaultBookID
-	}
-	authorId := tempAuthorID
-	if tempAuthorID == "" {
-		authorId = defaultAuthorID
-	}
+	tempBook, errBook := strconv.ParseInt(bookId, 0, 0)
 
-	tempBook, err := strconv.ParseInt(bookId, 0, 0)
-	if err != nil {
-		fmt.Println("Enter a valid Book ID :", err)
-	}
-
-	tempAuthor, err := strconv.ParseInt(authorId, 0, 0)
-	if err != nil {
-		fmt.Println("Enter a valid Author ID :", err)
-	}
+	tempAuthor, errAuthor := strconv.ParseInt(authorId, 0, 0)
 
 	books := BookInt.Get(int(tempBook), int(tempAuthor))
 	res, err := json.Marshal(books)
+
 	if len(books) == 0 {
 		res, err = json.Marshal("Msg : No books found")
+	} else if bookId != "" && errBook != nil {
+		res, err = json.Marshal("Msg : Invalid book Id")
+		w.WriteHeader(http.StatusBadRequest)
+	} else if authorId != "" && errAuthor != nil {
+		res, err = json.Marshal("Msg : Invalid author Id")
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		w.WriteHeader(http.StatusOK)
 	}
+
 	if err != nil {
 		fmt.Println("Marshalling error", err.Error())
 	}
-	w.Header().Set("Content-Type", "pkglication/json")
-	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
 
