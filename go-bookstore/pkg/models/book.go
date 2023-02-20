@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strconv"
 
+	"github.com/deadking/go-bookstore/pkg/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
@@ -13,6 +14,13 @@ type Book struct {
 	Publication string `json:"publication,omitempty"`
 	AuthorID    uint   `json:"author_id,omitempty"`
 	Author      Author `json:"author" gorm:"foreignKey:AuthorID ;references:ID;omitempty"`
+}
+
+type IBookCRUD interface {
+	Create(book Book) (*types.ResponseBook, string)
+	Update(ID int, updateBook Book) (*types.ResponseBook, string)
+	Delete(ID int) (string)
+	Get(bookID, authorID int) []types.ResponseBook
 }
 
 func authorIDValidate(a uint) validation.RuleFunc {
@@ -47,11 +55,14 @@ func pubNameValidate(a string) validation.RuleFunc {
 func (b Book) Validate() error {
 	return validation.ValidateStruct(&b,
 		validation.Field(&b.Name, validation.Length(1, 150),
-			validation.By(bookNameValidate(b.Name))),
+			validation.By(bookNameValidate(b.Name)),
+			validation.Required),
 		validation.Field(&b.Publication,
 			validation.Length(6, 50),
-			validation.By(pubNameValidate(b.Publication))),
+			validation.By(pubNameValidate(b.Publication)),
+			validation.Required),
 		validation.Field(&b.AuthorID,
-			validation.By(authorIDValidate(b.AuthorID))),
+			validation.By(authorIDValidate(b.AuthorID)),
+			validation.Required),
 	)
 }

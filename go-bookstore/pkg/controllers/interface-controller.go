@@ -1,14 +1,16 @@
 package controllers
 
-import "github.com/deadking/go-bookstore/pkg/repositories"
+import (
+	"github.com/deadking/go-bookstore/pkg/models"
+)
 
-var BookInt repositories.IBookCRUD
-var AuthorInt repositories.IAuthorCRUD
+var BookInt models.IBookCRUD
+var AuthorInt models.IAuthorCRUD
 
-func BookInterfaceInstance(bookInt repositories.IBookCRUD) {
+func BookInterfaceInstance(bookInt models.IBookCRUD) {
 	BookInt = bookInt
 }
 
-func AuthorInterfaceInstance(authorInt repositories.IAuthorCRUD) {
+func AuthorInterfaceInstance(authorInt models.IAuthorCRUD) {
 	AuthorInt = authorInt
 }

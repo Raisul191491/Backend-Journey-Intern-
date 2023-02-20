@@ -12,6 +12,7 @@ import (
 )
 
 func CreateAuthor(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "pkglication/json")
 	author := models.Author{}
 	finalMsg := types.CustomAuthorResponse{}
 
@@ -20,19 +21,21 @@ func CreateAuthor(w http.ResponseWriter, r *http.Request) {
 	err := author.Validate()
 	if err == nil {
 		finalMsg.Content, finalMsg.Msg = AuthorInt.Create(author)
+		w.WriteHeader(http.StatusCreated)
 	} else {
-		finalMsg.Content, finalMsg.Msg = &models.Author{}, err.Error()
+		finalMsg.Content, finalMsg.Msg = nil, err.Error()
+		w.WriteHeader(http.StatusBadRequest)
 	}
 	res, err := json.Marshal(finalMsg)
 	if err != nil {
-		fmt.Println("Marshalling error", err.Error())
+		res, _ = json.Marshal(err.Error())
+		w.WriteHeader(http.StatusNotAcceptable)
 	}
-	w.Header().Set("Content-Type", "pkglication/json")
-	w.WriteHeader(http.StatusCreated)
 	w.Write(res)
 }
 
 func DeleteAuthor(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "pkglication/json")
 	finalMsg := types.CustomDeleteResponse{}
 
 	// Getting query data
@@ -40,16 +43,18 @@ func DeleteAuthor(w http.ResponseWriter, r *http.Request) {
 	authorId := vars["authorId"]
 	ID, err := strconv.ParseInt(authorId, 0, 0)
 	if err != nil {
-		fmt.Println(err.Error())
+		finalMsg.Msg = err.Error()
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		finalMsg.Msg = AuthorInt.Delete(int(ID))
+		w.WriteHeader(http.StatusOK)
 	}
 
-	finalMsg.Msg = AuthorInt.Delete(int(ID))
 	res, err := json.Marshal(finalMsg)
 	if err != nil {
-		fmt.Println("Marshalling error", err.Error())
+		res, _ = json.Marshal(err.Error())
+		w.WriteHeader(http.StatusNotAcceptable)
 	}
-	w.Header().Set("Content-Type", "pkglication/json")
-	w.WriteHeader(http.StatusOK)
 	w.Write(res)
 }
 
@@ -67,6 +72,7 @@ func GetAuthor(w http.ResponseWriter, r *http.Request) {
 	}
 	if err != nil {
 		fmt.Println("Marshalling error", err.Error())
+		w.WriteHeader(http.StatusNotAcceptable)
 	} else if authorId != "" && errAuthor != nil {
 		res, err = json.Marshal("Msg : Invalid author Id")
 		w.WriteHeader(http.StatusBadRequest)
@@ -75,7 +81,8 @@ func GetAuthor(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		fmt.Println("Marshalling error", err.Error())
+		res, _ = json.Marshal(err.Error())
+		w.WriteHeader(http.StatusNotAcceptable)
 	}
 	w.Write(res)
 }

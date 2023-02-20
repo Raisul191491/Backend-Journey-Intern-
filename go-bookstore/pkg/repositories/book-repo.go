@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"github.com/deadking/go-bookstore/pkg/models"
+	"github.com/deadking/go-bookstore/pkg/types"
 	"gorm.io/gorm"
 )
 
@@ -11,22 +12,23 @@ type dbs struct {
 	DB *gorm.DB
 }
 
-func BookDbInstance(d *gorm.DB) IBookCRUD {
+func BookDbInstance(d *gorm.DB) models.IBookCRUD {
 	db = d
 	return &dbs{
 		DB: d,
 	}
 }
 
-func (repo *dbs) Create(b models.Book) (*models.Book, string) {
+func (repo *dbs) Create(b models.Book) (*types.ResponseBook, string) {
 	author := models.Author{}
+	responseBook := types.ResponseBook{}
 	if err := db.
 		Table("authors").
 		Where("id=?", b.AuthorID).
 		First(&author).
 		Error; err == nil {
 		db.Table("books").Create(&b)
-		return &b, "Book created, Successfully"
+		return &responseBook, "Book created, Successfully"
 	}
 	return nil, "Author does not exist"
 }
@@ -35,18 +37,23 @@ func (repo *dbs) Delete(ID int) string {
 	var deletedBook models.Book
 
 	db.Where("ID=?", ID).Find(&deletedBook)
-	if deletedBook.Name == "" || deletedBook.Publication == "" {
-		return "Book not found to begin with"
+	if err := db.
+		Table("books").
+		Where("id=?", ID).
+		First(&deletedBook).
+		Error; err != nil {
+		return "Book not found to begin with..."
 	}
 	db.Where("ID=?", ID).Delete(&deletedBook)
 	return "Successfully deleted...."
 }
 
-func (repo *dbs) Update(ID int, updateBook models.Book) (models.Book, string) {
+func (repo *dbs) Update(ID int, updateBook models.Book) (*types.ResponseBook, string) {
 	var book models.Book
+	var responseBook types.ResponseBook
 	db.Where("ID=?", ID).Find(&book)
 	if book.Name == "" || book.Publication == "" {
-		return models.Book{}, "Book not found"
+		return &types.ResponseBook{}, "Book not found"
 	}
 
 	// Update or reject update
@@ -56,16 +63,27 @@ func (repo *dbs) Update(ID int, updateBook models.Book) (models.Book, string) {
 	if updateBook.Publication != "" {
 		book.Publication = updateBook.Publication
 	}
+	if updateBook.AuthorID != 0 {
+		book.AuthorID = updateBook.AuthorID
+	}
 	err := book.Validate()
 	if err == nil {
 		db.Save(&book)
-		return book, "Successfully updated"
+		responseBook = types.ResponseBook{
+			ID:          book.ID,
+			Name:        book.Name,
+			Publication: book.Publication,
+			AuthorID:    book.AuthorID,
+			Author:      types.ResponseAuthor(book.Author),
+		}
+		return &responseBook, "Successfully updated"
 	}
-	return book, err.Error()
+	return &responseBook, err.Error()
 }
 
-func (repo *dbs) Get(bookID, authorID int) []models.Book {
+func (repo *dbs) Get(bookID, authorID int) []types.ResponseBook {
 	var books []models.Book
+	var responseBooks []types.ResponseBook
 
 	if bookID > 0 && authorID > 0 {
 		db.
@@ -79,5 +97,14 @@ func (repo *dbs) Get(bookID, authorID int) []models.Book {
 	} else if bookID == 0 && authorID == 0 {
 		db.Joins("Author").Find(&books)
 	}
-	return books
+	for _, val := range books {
+		responseBooks = append(responseBooks, types.ResponseBook(types.ResponseBook{
+			ID:          val.ID,
+			Name:        val.Name,
+			Publication: val.Publication,
+			AuthorID:    val.AuthorID,
+			Author:      types.ResponseAuthor(val.Author),
+		}))
+	}
+	return responseBooks
 }

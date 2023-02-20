@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"github.com/deadking/go-bookstore/pkg/models"
+	"github.com/deadking/go-bookstore/pkg/types"
 	"gorm.io/gorm"
 )
 
@@ -9,16 +10,18 @@ type dba struct {
 	DB *gorm.DB
 }
 
-func AuthorDbInstance(d *gorm.DB) IAuthorCRUD {
+func AuthorDbInstance(d *gorm.DB) models.IAuthorCRUD {
 	db = d
 	return &dba{
 		DB: d,
 	}
 }
 
-func (repo *dba) Create(a models.Author) (*models.Author, string) {
+func (repo *dba) Create(a models.Author) (*types.ResponseAuthor, string) {
+	responseAuthor := types.ResponseAuthor{}
 	db.Table("authors").Create(&a)
-	return &a, "Author created, Successfully"
+	responseAuthor = types.ResponseAuthor(a)
+	return &responseAuthor, "Author created, Successfully"
 }
 
 // func (repo *dba) Update(ID int, updateAuthor models.Author) (models.Author, string)
@@ -36,12 +39,16 @@ func (repo *dba) Delete(ID int) string {
 	return "Successfully deleted...."
 }
 
-func (repo *dba) Get(authorID int) []models.Author {
+func (repo *dba) Get(authorID int) []types.ResponseAuthor {
 	var authors []models.Author
+	var responseAuthors []types.ResponseAuthor
 	if authorID > 0 {
 		db.Where("id=?", authorID).Find(&authors)
-		return authors
+	} else {
+		db.Find(&authors)
 	}
-	db.Find(&authors)
-	return authors
+	for _, val := range authors {
+		responseAuthors = append(responseAuthors, types.ResponseAuthor(val))
+	}
+	return responseAuthors
 }

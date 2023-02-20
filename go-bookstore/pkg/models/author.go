@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strconv"
 
+	"github.com/deadking/go-bookstore/pkg/types"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
 
@@ -11,6 +12,13 @@ type Author struct {
 	ID         uint   `gorm:"primaryKey;autoIncrement:true" json:"id,omitempty"`
 	AuthorName string `json:"author_name,omitempty"`
 	Age        int    `json:"age,omitempty"`
+}
+
+type IAuthorCRUD interface {
+	Create(book Author) (*types.ResponseAuthor, string)
+	// Update(ID int, updateAuthor models.Author) (models.Author, string)
+	Delete(ID int) string
+	Get(authorID int) []types.ResponseAuthor
 }
 
 func ageValidate(a int) validation.RuleFunc {
