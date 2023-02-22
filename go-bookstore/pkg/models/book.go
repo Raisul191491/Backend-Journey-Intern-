@@ -17,9 +17,9 @@ type Book struct {
 }
 
 type IBookCRUD interface {
-	Create(book Book) (*types.ResponseBook, string)
-	Update(ID int, updateBook Book) (*types.ResponseBook, string)
-	Delete(ID int) (string)
+	Create(book Book) (*types.ResponseBook, error)
+	Update(updateBook Book) (*types.ResponseBook, error)
+	Delete(ID int) error
 	Get(bookID, authorID int) []types.ResponseBook
 }
 
@@ -58,7 +58,7 @@ func (b Book) Validate() error {
 			validation.By(bookNameValidate(b.Name)),
 			validation.Required),
 		validation.Field(&b.Publication,
-			validation.Length(6, 50),
+			validation.Length(4, 150),
 			validation.By(pubNameValidate(b.Publication)),
 			validation.Required),
 		validation.Field(&b.AuthorID,

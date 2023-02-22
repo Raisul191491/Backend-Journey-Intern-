@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"errors"
+
 	"github.com/deadking/go-bookstore/pkg/models"
 	"github.com/deadking/go-bookstore/pkg/types"
 	"gorm.io/gorm"
@@ -17,26 +19,38 @@ func AuthorDbInstance(d *gorm.DB) models.IAuthorCRUD {
 	}
 }
 
-func (repo *dba) Create(a models.Author) (*types.ResponseAuthor, string) {
+func (repo *dba) Create(a models.Author) (*types.ResponseAuthor, error) {
 	responseAuthor := types.ResponseAuthor{}
-	db.Table("authors").Create(&a)
+	if err := db.Table("authors").Create(&a).Error; err != nil {
+		return &responseAuthor, err
+	}
 	responseAuthor = types.ResponseAuthor(a)
-	return &responseAuthor, "Author created, Successfully"
+	return &responseAuthor, nil
 }
 
 // func (repo *dba) Update(ID int, updateAuthor models.Author) (models.Author, string)
 
-func (repo *dba) Delete(ID int) string {
+func (repo *dba) Delete(ID int) error {
+
+	tempAuthors := repo.Get(ID)
+	if len(tempAuthors) == 0 {
+		return errors.New("no Author Found")
+	}
 	var deletedAuthor models.Author
 	var deletedBooks []models.Book
 
-	db.Where("id=?", ID).Find(&deletedAuthor)
-	if deletedAuthor.AuthorName == "" || deletedAuthor.Age == 0 {
-		return "Author not found to begin with"
-	}
+	// if deletedAuthor.AuthorName == "" || deletedAuthor.Age == 0 {
+	// 	return ErrorResponse.Error("Author not found ")
+	// }
 	db.Where("author_id=?", ID).Delete(&deletedBooks)
-	db.Where("id=?", ID).Delete(&deletedAuthor)
-	return "Successfully deleted...."
+	if err := db.Where("id=?", ID).Delete(&deletedAuthor).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func Get(ID int) {
+	panic("unimplemented")
 }
 
 func (repo *dba) Get(authorID int) []types.ResponseAuthor {

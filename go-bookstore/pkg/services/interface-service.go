@@ -1,16 +1,16 @@
-package controllers
+package services
 
 import (
 	"github.com/deadking/go-bookstore/pkg/models"
 )
 
-var BookInt models.IBookCRUD
-var AuthorInt models.IAuthorCRUD
+var BookInterface models.IBookCRUD
+var AuthorInterface models.IAuthorCRUD
 
 func BookInterfaceInstance(bookInt models.IBookCRUD) {
-	BookInt = bookInt
+	BookInterface = bookInt
 }
 
 func AuthorInterfaceInstance(authorInt models.IAuthorCRUD) {
-	AuthorInt = authorInt
+	AuthorInterface = authorInt
 }

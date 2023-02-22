@@ -1,32 +1,20 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
-
-	"github.com/deadking/go-bookstore/pkg/config"
-	"github.com/deadking/go-bookstore/pkg/routes"
-	"github.com/gorilla/mux"
-	"gorm.io/gorm"
+	"github.com/deadking/go-bookstore/pkg/containers"
 )
-
-var DB *gorm.DB
 
 func main() {
 
-	// Database connect
-	config.Connect()
-	DB = config.GetDB()
+	// Initialize Database
+	DB := containers.InitializeDatabse()
 
-	// Routing
-	r := mux.NewRouter()
-	routes.RegisteredBookStoreRoutes(r, DB)
-	http.Handle("/", r)
+	// Initialize Interface
+	containers.Initializeinterfaces(DB)
+
+	// initalize Routing
+	router := containers.InitalizeRouter()
 
 	// Initialize server
-	fmt.Println("Server starting.......")
-	err := http.ListenAndServe("localhost:9010", r)
-	if err != nil {
-		panic("Server lost")
-	}
+	containers.InitializeServer(router)
 }

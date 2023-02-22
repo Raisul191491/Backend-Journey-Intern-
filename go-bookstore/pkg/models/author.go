@@ -15,17 +15,13 @@ type Author struct {
 }
 
 type IAuthorCRUD interface {
-	Create(book Author) (*types.ResponseAuthor, string)
-	// Update(ID int, updateAuthor models.Author) (models.Author, string)
-	Delete(ID int) string
+	Create(book Author) (*types.ResponseAuthor, error)
+	Delete(ID int) error
 	Get(authorID int) []types.ResponseAuthor
 }
 
 func ageValidate(a int) validation.RuleFunc {
 	return func(value interface{}) error {
-		if value.(int) == 0 {
-			return errors.New("enter valid age (Numerical)")
-		}
 		age := value.(int)
 		if age < 12 || age > 130 {
 			return errors.New("enter valid age(Numerical), within 12 and 130")

@@ -1,15 +1,17 @@
 package types
 
 type CustomBookResponse struct {
-	Content *ResponseBook `json:"content,omitempty"`
-	Msg     string
+	Content  *ResponseBook `json:"Book,omitempty"`
+	ErrorMsg error         `json:"Error message,omitempty"`
+	Msg      string
 }
 type CustomAuthorResponse struct {
-	Content *ResponseAuthor `json:"content,omitempty"`
-	Msg     string
+	Content  *ResponseAuthor `json:"Author,omitempty"`
+	ErrorMsg error           `json:"Error message,omitempty"`
+	Msg      string
 }
 
-type CustomDeleteResponse struct {
+type CustomOnlyResponse struct {
 	Msg string
 }
 
