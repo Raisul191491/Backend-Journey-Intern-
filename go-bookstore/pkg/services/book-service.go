@@ -17,8 +17,21 @@ func DeleteBookService(ID int) error {
 }
 
 func GetBookService(bookId, authorId int) []types.ResponseBook {
+	var responseBooks []types.ResponseBook
 	booklist := BookInterface.Get(bookId, authorId)
-	return booklist
+	for _, val := range booklist {
+		responseBooks = append(responseBooks, types.ResponseBook{
+			ID:          val.ID,
+			Name:        val.Name,
+			Publication: val.Publication,
+			AuthorID:    val.AuthorID,
+			Author: types.ResponseAuthor{
+				AuthorName: val.Author.AuthorName,
+				Age:        val.Author.Age,
+			},
+		})
+	}
+	return responseBooks
 }
 
 func UpdateBookService(updateBook models.Book) (*types.ResponseBook, error) {

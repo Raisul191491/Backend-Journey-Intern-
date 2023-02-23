@@ -53,9 +53,8 @@ func (repo *dbs) Delete(ID int) error {
 	return nil
 }
 
-func (repo *dbs) Get(bookID, authorID int) []types.ResponseBook {
+func (repo *dbs) Get(bookID, authorID int) []models.Book {
 	var books []models.Book
-	var responseBooks []types.ResponseBook
 
 	if bookID > 0 && authorID > 0 {
 		db.
@@ -69,19 +68,7 @@ func (repo *dbs) Get(bookID, authorID int) []types.ResponseBook {
 	} else if bookID == 0 && authorID == 0 {
 		db.Joins("Author").Find(&books)
 	}
-	for _, val := range books {
-		responseBooks = append(responseBooks, types.ResponseBook{
-			ID:          val.ID,
-			Name:        val.Name,
-			Publication: val.Publication,
-			AuthorID:    val.AuthorID,
-			Author: types.ResponseAuthor{
-				AuthorName: val.Author.AuthorName,
-				Age:        val.Author.Age,
-			},
-		})
-	}
-	return responseBooks
+	return books
 }
 
 func (repo *dbs) Update(book models.Book) (*types.ResponseBook, error) {

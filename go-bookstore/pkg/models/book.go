@@ -20,7 +20,7 @@ type IBookCRUD interface {
 	Create(book Book) (*types.ResponseBook, error)
 	Update(updateBook Book) (*types.ResponseBook, error)
 	Delete(ID int) error
-	Get(bookID, authorID int) []types.ResponseBook
+	Get(bookID, authorID int) []Book
 }
 
 func authorIDValidate(a uint) validation.RuleFunc {
