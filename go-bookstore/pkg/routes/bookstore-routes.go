@@ -11,13 +11,13 @@ var db *gorm.DB
 var RegisteredBookStoreRoutes = func(router *mux.Router) {
 
 	// Book routes
-	router.HandleFunc("/book", controllers.CreateBook).Methods("POST")
-	router.HandleFunc("/book", controllers.GetBookAnyway).Methods("GET")
-	router.HandleFunc("/book/{bookId}", controllers.UpdateBook).Methods("PUT")
-	router.HandleFunc("/book/{bookId}", controllers.DeleteBook).Methods("DELETE")
+	router.HandleFunc("/books", controllers.CreateBook).Methods("POST")
+	router.HandleFunc("/books", controllers.GetBookAnyway).Methods("GET")
+	router.HandleFunc("/books/{bookId}", controllers.UpdateBook).Methods("PUT")
+	router.HandleFunc("/books/{bookId}", controllers.DeleteBook).Methods("DELETE")
 
 	// Author routes
-	router.HandleFunc("/author", controllers.CreateAuthor).Methods("POST")
-	router.HandleFunc("/author", controllers.GetAuthor).Methods("GET")
-	router.HandleFunc("/author/{authorId}", controllers.DeleteAuthor).Methods("DELETE")
+	router.HandleFunc("/authors", controllers.CreateAuthor).Methods("POST")
+	router.HandleFunc("/authors", controllers.GetAuthor).Methods("GET")
+	router.HandleFunc("/authors/{authorId}", controllers.DeleteAuthor).Methods("DELETE")
 }

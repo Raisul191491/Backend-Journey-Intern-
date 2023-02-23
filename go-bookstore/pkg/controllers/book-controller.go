@@ -91,9 +91,11 @@ func GetBookAnyway(w http.ResponseWriter, r *http.Request) {
 	finalMsg := types.CustomBookResponse{}
 	// Getting query data
 	bookId := r.URL.Query().Get("bookId")
+
 	authorId := r.URL.Query().Get("authorId")
 
 	tempBook, errBook := strconv.ParseInt(bookId, 0, 0)
+
 	tempAuthor, errAuthor := strconv.ParseInt(authorId, 0, 0)
 
 	books := services.GetBookService(int(tempBook), int(tempAuthor))

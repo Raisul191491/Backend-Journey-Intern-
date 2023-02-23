@@ -1,20 +1,20 @@
 package main
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/deadking/go-bookstore/pkg/containers"
 )
 
 func main() {
 
 	// Initialize Database
-	DB := containers.InitializeDatabse()
+	router := containers.Init()
 
-	// Initialize Interface
-	containers.Initializeinterfaces(DB)
-
-	// initalize Routing
-	router := containers.InitalizeRouter()
-
-	// Initialize server
-	containers.InitializeServer(router)
+	fmt.Println("Server starting.......")
+	err := http.ListenAndServe("localhost:9010", router)
+	if err != nil {
+		panic("Server lost")
+	}
 }

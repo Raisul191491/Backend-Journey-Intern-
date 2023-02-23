@@ -16,11 +16,11 @@ type CustomOnlyResponse struct {
 }
 
 type ResponseBook struct {
-	ID          uint   `json:"id,omitempty"`
-	Name        string `json:"name,omitempty"`
-	Publication string `json:"publication,omitempty"`
-	AuthorID    uint   `json:"author_id,omitempty"`
-	Author      ResponseAuthor
+	ID          uint           `json:"id,omitempty"`
+	Name        string         `json:"name,omitempty"`
+	Publication string         `json:"publication,omitempty"`
+	AuthorID    uint           `json:"author_id,omitempty"`
+	Author      ResponseAuthor `json:"author,omitempty"`
 }
 
 type ResponseAuthor struct {
